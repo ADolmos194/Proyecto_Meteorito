@@ -106,20 +106,15 @@ export class Clientes implements OnInit {
     ) {}
 
     async cargarClientes() {
+        this.isLoading = true;
         try {
             const response: Cliente[] = await this.clienteService.getClientes();
-            const TipoDocumento = response.map((cliente: Cliente) => {
-                const tipodocumento = this.opcionesTipodocumento.find((e) => e.id === cliente.tipodocumento_id);
-                return {
-                    ...cliente,
-                    tipodocumento_nombre: tipodocumento ? tipodocumento.nombre : 'Desconocido'
-                };
-            });
-            this.clientes.set(TipoDocumento);
+            this.clientes.set(response);
         } catch (error) {
             console.error('Error al cargar los clientes:', error);
         }
     }
+
 
     async cargarOpciones(service: () => Promise<any>, opcionesRef: Estado[], label: string) {
         try {
@@ -176,6 +171,11 @@ export class Clientes implements OnInit {
     }
 
     async guardarClientes() {
+        this.enviar = true;
+
+        if (Object.values(this.cliente).some(valor => !valor))
+            return this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Completa todos los campos.' });
+
         this.isLoading = true;
         try {
 
