@@ -19,7 +19,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ClienteService } from '@/services/clientes_service/clientes.service';
-import { Cliente } from './clientes.model';
+import { Cliente } from '@/services/clientes_service/clientes.model';
 import { Estado } from '@/./services/estado_service/estado.model';
 import { CheckboxModule } from 'primeng/checkbox';
 import { EstadoService } from '@/services/estado_service/estado.service';
@@ -172,9 +172,6 @@ export class Clientes implements OnInit {
 
     async guardarClientes() {
         this.enviar = true;
-
-        if (Object.values(this.cliente).some(valor => !valor))
-            return this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Completa todos los campos.' });
 
         this.isLoading = true;
         try {

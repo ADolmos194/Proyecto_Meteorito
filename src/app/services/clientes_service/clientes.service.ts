@@ -4,6 +4,7 @@ import { axiosIns, api_url } from '@/plugins/axios';
 export const url = api_url;
 export const endpoints = {
     clientes: "registros/clientes/",
+    clientesactivos: "registros/clientesactivos/",
     crearclientes: "registros/clientes/crear/",
     actualizarclientes: (id: number) => `registros/clientes/actualizar/${id}/`,
     eliminarclientes: (id: number) => `registros/clientes/eliminar/${id}/`,
@@ -22,6 +23,17 @@ export class ClienteService {
             throw error;
         }
     }
+
+    async getClientesActivos() {
+        try {
+            const response = await axiosIns.get(`${url}/${endpoints.clientesactivos}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error al obtener los clientes activos:', error);
+            throw error;
+        }
+    }
+
     async createCliente(data : any) {
         try {
             const response = await axiosIns.post(`${url}/${endpoints.crearclientes}`, data);

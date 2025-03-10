@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
+import { last } from 'rxjs';
 
 @Component({
     selector: 'app-menu',
@@ -25,6 +26,42 @@ export class AppMenu {
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
             },
             {
+                label: 'Procesos',
+                icon: 'pi pi-fw pi-briefcase',
+                routerLink: ['/pages'],
+                items: [
+
+                    {
+                        label: 'Registros',
+                        icon: 'pi pi-fw pi-clipboard',
+                        items: [
+                            {
+                                label: 'Clientes',
+                                icon: 'pi pi-fw pi-users',
+                                routerLink: ['/registros/clientes']
+                            },
+                            {
+                                label: 'Tesis',
+                                icon: 'pi pi-fw pi-graduation-cap',
+                                routerLink: ['/registros/tesis']
+                            },
+                        ]
+                    }
+                ]
+            },
+            {
+                label: 'Seguridad',
+                items: [
+                    { label: 'Cerrar sesión', icon: 'pi pi-fw pi-sign-out', routerLink: ['/auth/login'] }
+                ]
+            }
+
+        ];
+    }
+}
+
+
+/*          {
                 label: 'UI Components',
                 items: [
                     { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', routerLink: ['/uikit/formlayout'] },
@@ -90,30 +127,6 @@ export class AppMenu {
                 ]
             },
             {
-                label: 'Procesos',
-                icon: 'pi pi-fw pi-briefcase',
-                routerLink: ['/pages'],
-                items: [
-
-                    {
-                        label: 'Registros',
-                        icon: 'pi pi-fw pi-clipboard',
-                        items: [
-                            {
-                                label: 'Clientes',
-                                icon: 'pi pi-fw pi-users',
-                                routerLink: ['/registros/clientes']
-                            },
-                            {
-                                label: 'Universidad',
-                                icon: 'pi pi-fw pi-graduation-cap',
-                                routerLink: ['/registros/universidad']
-                            },
-                        ]
-                    }
-                ]
-            },
-            {
                 label: 'Hierarchy',
                 items: [
                     {
@@ -173,6 +186,4 @@ export class AppMenu {
                     }
                 ]
             }
-        ];
-    }
-}
+*/
