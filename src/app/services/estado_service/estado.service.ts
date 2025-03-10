@@ -12,7 +12,7 @@ export const endpoints = {
 export class EstadoService {
     async getEstado() {
         try {
-            const response = await axiosIns.get(`${url}/${endpoints.estado}`);
+            const response = await axiosIns.get(`${url}${endpoints.estado}`);
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener los estados:', error);

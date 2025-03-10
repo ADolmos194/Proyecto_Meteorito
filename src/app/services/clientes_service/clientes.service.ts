@@ -16,7 +16,7 @@ export const endpoints = {
 export class ClienteService {
     async getClientes() {
         try {
-            const response = await axiosIns.get(`${url}/${endpoints.clientes}`);
+            const response = await axiosIns.get(`${url}${endpoints.clientes}`);
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener los clientes:', error);
@@ -26,7 +26,7 @@ export class ClienteService {
 
     async getClientesActivos() {
         try {
-            const response = await axiosIns.get(`${url}/${endpoints.clientesactivos}`);
+            const response = await axiosIns.get(`${url}${endpoints.clientesactivos}`);
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener los clientes activos:', error);
@@ -36,7 +36,7 @@ export class ClienteService {
 
     async createCliente(data : any) {
         try {
-            const response = await axiosIns.post(`${url}/${endpoints.crearclientes}`, data);
+            const response = await axiosIns.post(`${url}${endpoints.crearclientes}`, data);
             return response.data;
         } catch (error) {
             console.error('Error al crear al cliente:', error);
@@ -45,7 +45,7 @@ export class ClienteService {
     }
     async updateCliente(id:number, data: any) {
         try {
-            const response = await axiosIns.put(`${url}/${endpoints.actualizarclientes(id)}`, data);
+            const response = await axiosIns.put(`${url}${endpoints.actualizarclientes(id)}`, data);
             return response.data;
         } catch (error) {
             console.error('Error al actualizar al cliente:', error);
@@ -55,7 +55,7 @@ export class ClienteService {
 
     async deleteCliente(id:number) {
         try {
-            const response = await axiosIns.delete(`${url}/${endpoints.eliminarclientes(id)}`);
+            const response = await axiosIns.delete(`${url}${endpoints.eliminarclientes(id)}`);
             return response.data;
         } catch (error) {
             console.error('Error al eliminar al cliente:', error);

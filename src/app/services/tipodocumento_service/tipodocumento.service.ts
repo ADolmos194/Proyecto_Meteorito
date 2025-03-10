@@ -12,7 +12,7 @@ export const endpoints = {
 export class TipoDocumentoService {
     async getTipoDocumento() {
         try {
-            const response = await axiosIns.get(`${url}/${endpoints.tipodocumento}`);
+            const response = await axiosIns.get(`${url}${endpoints.tipodocumento}`);
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener los tipos de documentos:', error);
