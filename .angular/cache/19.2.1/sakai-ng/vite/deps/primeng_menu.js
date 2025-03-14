@@ -1,43 +1,37 @@
 import {
   Tooltip,
   TooltipModule
-} from "./chunk-ZFEJM2FM.js";
+} from "./chunk-SVCKEXMV.js";
 import {
   Badge,
   BadgeModule
-} from "./chunk-536OTEOZ.js";
+} from "./chunk-U4PV6TUI.js";
+import {
+  Ripple
+} from "./chunk-42R3N6OQ.js";
 import {
   RouterLink,
   RouterLinkActive,
   RouterModule
 } from "./chunk-UJSRQYPS.js";
 import {
+  zindexutils
+} from "./chunk-E2HGVAFI.js";
+import {
   ConnectedOverlayScrollHandler
 } from "./chunk-5G7WYC4N.js";
 import {
-  zindexutils
-} from "./chunk-HVUAAARR.js";
-import {
-  Ripple
-} from "./chunk-7FU4SZPR.js";
-import {
-  animate,
-  style,
-  transition,
-  trigger
-} from "./chunk-7GGTTNGW.js";
-import {
   BaseComponent
-} from "./chunk-5TGCS2HN.js";
-import "./chunk-JKR3ODZA.js";
+} from "./chunk-RGD3J22D.js";
+import "./chunk-EB5G4ZMI.js";
 import {
   BaseStyle
-} from "./chunk-3BXFUZZG.js";
+} from "./chunk-X26JCCJ5.js";
 import {
   OverlayService,
   PrimeTemplate,
   SharedModule
-} from "./chunk-CMI4QXRB.js";
+} from "./chunk-DRP4WDYB.js";
 import {
   absolutePosition,
   appendChild,
@@ -47,11 +41,19 @@ import {
   isTouchDevice,
   relativePosition,
   uuid
-} from "./chunk-GFVF2TMO.js";
+} from "./chunk-WBS44QWF.js";
+import {
+  animate,
+  style,
+  transition,
+  trigger
+} from "./chunk-7GGTTNGW.js";
 import {
   DomSanitizer
 } from "./chunk-MF7F53DD.js";
 import "./chunk-R4OYVE3P.js";
+import "./chunk-TZIJKBMI.js";
+import "./chunk-YAPJLE7E.js";
 import {
   CommonModule,
   NgClass,
@@ -127,8 +129,6 @@ import {
 import "./chunk-WPM5VTLQ.js";
 import "./chunk-PEBH6BBU.js";
 import "./chunk-4S3KYZTJ.js";
-import "./chunk-US7LRVFB.js";
-import "./chunk-PXYLXCRT.js";
 import "./chunk-4ULMLRGT.js";
 
 // node_modules/primeng/fesm2022/primeng-menu.mjs

@@ -1,36 +1,45 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import { RouterModule, Router } from '@angular/router';
+import { MenuItem, MessageService } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
-import { last } from 'rxjs';
+import { ToastModule } from 'primeng/toast';
+import { AutenticacionService } from '@/services/login_service/login.service';
 
 @Component({
     selector: 'app-menu',
     standalone: true,
-    imports: [CommonModule, AppMenuitem, RouterModule],
-    template: `<ul class="layout-menu">
+    imports: [CommonModule, AppMenuitem, RouterModule, ToastModule], // Agrega ToastModule
+    template: `
+    <p-toast></p-toast> <!-- Toast para mostrar mensajes -->
+    <ul class="layout-menu">
         <ng-container *ngFor="let item of model; let i = index">
             <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
             <li *ngIf="item.separator" class="menu-separator"></li>
         </ng-container>
-    </ul> `
+    </ul> `,
+    providers: [MessageService] // Proveedor necesario para los toasts
 })
 export class AppMenu {
     model: MenuItem[] = [];
+
+    constructor(
+        private autenticacionService: AutenticacionService,
+        private router: Router,
+        private messageService: MessageService // Inyección del servicio de mensajes
+    ) {}
 
     ngOnInit() {
         this.model = [
             {
                 label: 'INICIO',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
+                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard/dashboard'] }]
             },
             {
                 label: 'Procesos',
                 icon: 'pi pi-fw pi-briefcase',
                 routerLink: ['/pages'],
                 items: [
-
                     {
                         label: 'Registros',
                         icon: 'pi pi-fw pi-clipboard',
@@ -52,11 +61,19 @@ export class AppMenu {
             {
                 label: 'Seguridad',
                 items: [
-                    { label: 'Cerrar sesión', icon: 'pi pi-fw pi-sign-out', routerLink: ['/auth/login'] }
+                    { label: 'Cerrar sesión', icon: 'pi pi-fw pi-sign-out', command: () => this.cerrarSesion()}
                 ]
             }
-
         ];
+    }
+
+    cerrarSesion() {
+        this.autenticacionService.logoutUser().then(() => {
+            this.router.navigate(['/auth/login']);
+            console.log('Cierre de sesion exitoso');
+        }).catch(() => {
+            console.error('error al cerrar la sesion')
+        });
     }
 }
 
