@@ -54,6 +54,11 @@ export class AppMenu {
                                 icon: 'pi pi-fw pi-graduation-cap',
                                 routerLink: ['/registros/tesis']
                             },
+                            {
+                                label: 'Pagos',
+                                icon: 'pi pi-fw pi-money-bill',
+                                routerLink: ['/registros/pagos_clientes']
+                            },
                         ]
                     }
                 ]
