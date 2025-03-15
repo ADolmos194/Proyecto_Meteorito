@@ -33,7 +33,7 @@ export class AppMenu {
         this.model = [
             {
                 label: 'INICIO',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard/dashboard'] }]
+                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
             },
             {
                 label: 'Procesos',
