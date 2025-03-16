@@ -1,4 +1,4 @@
-export interface PagosClientes {
+export interface PC {
     id: number;
     tesis_id : number;
     monto_tesis : number;
@@ -10,5 +10,5 @@ export interface PagosClientes {
     estado_pagos_id : number;
     estado_id : number;
     fecha_creacion : string;
-    fecha_modificacion : string;
+    fecha_modificacion: string;
 }

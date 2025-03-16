@@ -10,6 +10,7 @@
     </ng-template>
 </p-toolbar>
 
+<div class="contenedor">
 <p-table #dt [value]="tesis()" [rows]="10" [columns]="cols" [paginator]="true"
     [globalFilterFields]="['clientes_id', 'nombre_tesis', 'universidad', 'usuario_plataforma', 'clave_plataforma', 'estado_id', 'fecha_creacion', 'fecha_modificacion']"
     [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarTesis" [rowHover]="true" dataKey="id"
@@ -27,32 +28,32 @@
 
     <ng-template #header>
         <tr>
-            <th style="width: 3rem">
+            <th>
                 <p-tableheadercheckbox />
             </th>
             <th style="min-width: 5rem">Opciones</th>
-            <th pSortableColumn="clientes_id" style="min-width:5rem">Clientes
+            <th pSortableColumn="clientes_id">Clientes
                 <p-sorticon field="clientes_id" />
             </th>
-            <th pSortableColumn="nombre_tesis" style="min-width:5rem">Nombre de la tesis
+            <th pSortableColumn="nombre_tesis">Nombre de la tesis
                 <p-sorticon field="nombre_tesis" />
             </th>
-            <th pSortableColumn="universidad" style="min-width:5rem">Universidad
+            <th pSortableColumn="universidad">Universidad
                 <p-sorticon field="universidad" />
             </th>
-            <th pSortableColumn="usuario_plataforma" style="min-width:5rem">Usuario de plataforma
+            <th pSortableColumn="usuario_plataforma">Usuario de plataforma
                 <p-sorticon field="usuario_plataforma" />
             </th>
-            <th pSortableColumn="clave_plataforma" style="min-width:5rem">Clave de plataforma
+            <th pSortableColumn="clave_plataforma">Clave de plataforma
                 <p-sorticon field="clave_plataforma" />
             </th>
-            <th pSortableColumn="estado_id" style="min-width: 5rem">Estado
+            <th pSortableColumn="estado_id">Estado
                 <p-sorticon field="estado_id" />
             </th>
-            <th pSortableColumn="fecha_creacion" style="min-width:5rem">Fecha creación
+            <th pSortableColumn="fecha_creacion">Fecha creación
                 <p-sorticon field="fecha_creacion" />
             </th>
-            <th pSortableColumn="fecha_modificacion" style="min-width:5rem">Fecha modificación
+            <th pSortableColumn="fecha_modificacion">Fecha modificación
                 <p-sorticon field="fecha_modificacion" />
             </th>
         </tr>
@@ -60,29 +61,29 @@
 
     <ng-template #body let-ttesiss>
         <tr>
-            <td style="width: 3rem">
+            <td>
                 <p-tableCheckbox [value]="ttesiss" />
             </td>
-            <td style="min-width: 8rem">
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+            <td>
+                <p-button label="Editar" icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
                     (click)="editarTesis(ttesiss)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
                     (click)="eliminarTesis(ttesiss)" />
             </td>
-            <td style="min-width: 10rem">{{ ttesiss.nombre_completo }}</td>
-            <td style="min-width: 10rem">{{ ttesiss.nombre_tesis }}</td>
-            <td style="min-width: 15rem">{{ ttesiss.universidad }}</td>
-            <td style="min-width: 10rem">{{ ttesiss.usuario_plataforma }}</td>
-            <td style="min-width: 10rem">{{ ttesiss.clave_plataforma }}</td>
-            <td style="min-width: 10rem">
+            <td>{{ ttesiss.nombre_completo }}</td>
+            <td>{{ ttesiss.nombre_tesis }}</td>
+            <td>{{ ttesiss.universidad }}</td>
+            <td>{{ ttesiss.usuario_plataforma }}</td>
+            <td>{{ ttesiss.clave_plataforma }}</td>
+            <td>
                 <p-tag [value]="getEstado(ttesiss.estado_id)" [severity]="getEstadoSeverity(ttesiss.estado_id)" />
             </td>
-            <td style="min-width: 10rem">{{ ttesiss.fecha_creacion }}</td>
-            <td style="min-width: 10rem">{{ ttesiss.fecha_modificacion }}</td>
+            <td>{{ ttesiss.fecha_creacion }}</td>
+            <td>{{ ttesiss.fecha_modificacion }}</td>
         </tr>
     </ng-template>
 </p-table>
-
+</div>
 <div class="card">
     <p-drawer [(visible)]="tesisDialogo" [style]="{ width: '450px' }"
         [header]="accion === 1 ? 'Nueva Tesis' : 'Actualizar Tesis'" [modal]="true" position="right">
@@ -142,3 +143,27 @@
 </div>
 
 <p-confirmdialog [style]="{ width: '450px' }" />
+
+
+<style>
+    .contenedor{
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    td{
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+
+    th{
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+</style>

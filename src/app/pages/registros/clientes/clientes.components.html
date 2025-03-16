@@ -9,7 +9,7 @@
         <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
     </ng-template>
 </p-toolbar>
-
+<div class="contenedor">
 <p-table #dt [value]="clientes()" [rows]="10" [columns]="cols" [paginator]="true"
     [globalFilterFields]="['tipodocumento_id', 'nro_documento', 'nombre_completo', 'correo_electronico', 'nro_celular', 'estado_id', 'fecha_creacion', 'fecha_modificacion']"
     [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarClientes" [rowHover]="true" dataKey="id"
@@ -24,35 +24,35 @@
             </p-iconfield>
         </div>
     </ng-template>
-    
+
     <ng-template #header>
         <tr>
-            <th style="width: 3rem">
+            <th>
                 <p-tableheadercheckbox />
             </th>
-            <th style="min-width: 5rem">Opciones</th>
-            <th pSortableColumn="tipodocumento_id" style="min-width:5rem">Tipo documento
+            <th>Opciones</th>
+            <th pSortableColumn="tipodocumento_id">Tipo documento
                 <p-sorticon field="tipodocumento_id" />
             </th>
-            <th pSortableColumn="nro_documento" style="min-width:5rem">Nro documento
+            <th pSortableColumn="nro_documento">Nro documento
                 <p-sorticon field="nro_documento" />
             </th>
-            <th pSortableColumn="nombre_completo" style="min-width:5rem">Nombre completo
+            <th pSortableColumn="nombre_completo">Nombre completo
                 <p-sorticon field="nombre_completo" />
             </th>
-            <th pSortableColumn="correo_electronico" style="min-width:5rem">Correo
+            <th pSortableColumn="correo_electronico">Correo
                 <p-sorticon field="correo_electronico" />
             </th>
-            <th pSortableColumn="nro_celular" style="min-width:5rem">Nro celular
+            <th pSortableColumn="nro_celular">Nro celular
                 <p-sorticon field="nro_celular" />
             </th>
-            <th pSortableColumn="estado_id" style="min-width: 5rem">Estado
+            <th pSortableColumn="estado_id">Estado
                 <p-sorticon field="estado_id" />
             </th>
-            <th pSortableColumn="fecha_creacion" style="min-width:5rem">Fecha creación
+            <th pSortableColumn="fecha_creacion">Fecha creación
                 <p-sorticon field="fecha_creacion" />
             </th>
-            <th pSortableColumn="fecha_modificacion" style="min-width:5rem">Fecha modificación
+            <th pSortableColumn="fecha_modificacion">Fecha modificación
                 <p-sorticon field="fecha_modificacion" />
             </th>
         </tr>
@@ -60,29 +60,29 @@
 
     <ng-template #body let-cliente>
         <tr>
-            <td style="width: 3rem">
+            <td>
                 <p-tableCheckbox [value]="cliente" />
             </td>
-            <td style="min-width: 8rem">
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+            <td>
+                <p-button label="Editar" icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
                     (click)="editarCliente(cliente)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
                     (click)="eliminarCliente(cliente)" />
             </td>
-            <td style="min-width: 10rem">{{ cliente.tipodocumento_nombre }}</td>
-            <td style="min-width: 10rem">{{ cliente.nro_documento }}</td>
-            <td style="min-width: 15rem">{{ cliente.nombre_completo }}</td>
-            <td style="min-width: 10rem">{{ cliente.correo_electronico }}</td>
-            <td style="min-width: 10rem">{{ cliente.nro_celular }}</td>
-            <td style="min-width: 10rem">
+            <td>{{ cliente.tipodocumento_nombre }}</td>
+            <td>{{ cliente.nro_documento }}</td>
+            <td>{{ cliente.nombre_completo }}</td>
+            <td>{{ cliente.correo_electronico }}</td>
+            <td>{{ cliente.nro_celular }}</td>
+            <td>
                 <p-tag [value]="getEstado(cliente.estado_id)" [severity]="getEstadoSeverity(cliente.estado_id)" />
             </td>
-            <td style="min-width: 10rem">{{ cliente.fecha_creacion }}</td>
-            <td style="min-width: 10rem">{{ cliente.fecha_modificacion }}</td>
+            <td>{{ cliente.fecha_creacion }}</td>
+            <td>{{ cliente.fecha_modificacion }}</td>
         </tr>
     </ng-template>
 </p-table>
-
+</div>
 <div class="card">
     <p-drawer [(visible)]="clienteDialogo" [style]="{ width: '450px' }"
         [header]="accion === 1 ? 'Nuevo cliente' : 'Actualizar cliente'" [modal]="true" position="right">
@@ -141,3 +141,27 @@
 </div>
 
 <p-confirmdialog [style]="{ width: '450px' }" />
+
+
+<style>
+    .contenedor{
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    td{
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+
+    th{
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+</style>
