@@ -4,6 +4,7 @@ import { axiosIns, api_url } from '@/plugins/axios';
 export const url = api_url;
 export const endpoints = {
     tesis: "registros/tesis/",
+    tesisclientesuniversidadactivas: "registros/tesisclientesuniversidadactivas/",
     crearTesis: "registros/tesis/crear/",
     actualizarTesis: (id: number) => `registros/tesis/actualizar/${id}/`,
     eliminarTesis: (id: number) => `registros/tesis/eliminar/${id}/`,
@@ -19,6 +20,15 @@ export class TesisService {
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener las tesis:', error);
+            throw error;
+        }
+    }
+    async getTesisClientesUniversidadActivas() {
+        try {
+            const response = await axiosIns.get(`${url}${endpoints.tesisclientesuniversidadactivas}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error al obtener las tesis clientes - universidad activas:', error);
             throw error;
         }
     }
@@ -50,5 +60,4 @@ export class TesisService {
             throw error;
         }
     }
-
 }

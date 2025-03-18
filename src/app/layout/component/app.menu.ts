@@ -18,7 +18,7 @@ import { AutenticacionService } from '@/services/login_service/login.service';
             <li *ngIf="item.separator" class="menu-separator"></li>
         </ng-container>
     </ul> `,
-    providers: [MessageService] // Proveedor necesario para los toasts
+    providers: [MessageService] 
 })
 export class AppMenu {
     model: MenuItem[] = [];
@@ -26,7 +26,7 @@ export class AppMenu {
     constructor(
         private autenticacionService: AutenticacionService,
         private router: Router,
-        private messageService: MessageService // Inyección del servicio de mensajes
+        private messageService: MessageService
     ) {}
 
     ngOnInit() {

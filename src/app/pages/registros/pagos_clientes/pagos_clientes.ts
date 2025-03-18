@@ -24,6 +24,9 @@ import { EstadoService } from '@/services/estado_service/estado.service';
 import { DrawerModule } from 'primeng/drawer';
 import { PC } from '@/services/pagos_clientes_service/pagos_clientes.model';
 import { PagosClientesService } from '@/services/pagos_clientes_service/pagos_clientes.service';
+import { tesisclienteuniversidad_activas } from '@/services/tesis_service/tesisclienteuniversidadactivas.model';
+import { TesisService } from '@/services/tesis_service/tesis.service';
+import { EstadoPago } from '@/services/estado_service/estadopago.model';
 
 interface Column {
     field: string;
@@ -88,7 +91,8 @@ export class Pagos_Clientes implements OnInit {
     cols!: Column[];
     accion: number = 1;
     opcionesEstado: Estado[] = [];
-
+    opcionesEstadoPago: EstadoPago[] = [];
+    opcionesTesisClientesUniversidad_Activas: tesisclienteuniversidad_activas[] = [];
     estado = [
         { label: 'ACTIVO', value: 1 },
         { label: 'INACTIVO', value: 2 }
@@ -106,7 +110,8 @@ export class Pagos_Clientes implements OnInit {
     constructor(
         private pago_clienteService: PagosClientesService,
         private messageService: MessageService,
-        private estadoService: EstadoService
+        private estadoService: EstadoService,
+        private tesisService: TesisService
     ) {}
 
     async cargarPagosClientes() {
@@ -138,6 +143,8 @@ export class Pagos_Clientes implements OnInit {
     async ngOnInit() {
         this.isLoading = true;
         try {
+            await Promise.all([this.cargarOpciones(this.tesisService.getTesisClientesUniversidadActivas.bind(this.estadoService), this.opcionesTesisClientesUniversidad_Activas, 'estado')]);
+            await Promise.all([this.cargarOpciones(this.estadoService.getEstadoPagos.bind(this.estadoService), this.opcionesEstadoPago, 'estado pago')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             await this.cargarPagosClientes();
         } catch (error) {
@@ -220,27 +227,30 @@ export class Pagos_Clientes implements OnInit {
         }
     }
 
-    /*async guardarClientes() {
+    async guardarPagosClientes() {
         this.enviar = true;
 
         this.isLoading = true;
         try {
-            const clienteParaEnviar = {
-                id: this.cliente.id,
-                tipodocumento: this.cliente.tipodocumento_id,
-                nro_documento: this.cliente.nro_documento,
-                nombre_completo: this.cliente.nombre_completo,
-                correo_electronico: this.cliente.correo_electronico,
-                nro_celular: this.cliente.nro_celular,
-                estado: this.cliente.estado_id,
-                fecha_creacion: this.cliente.fecha_creacion,
-                fecha_modificacion: this.cliente.fecha_modificacion
+            const PagoClienteParaEnviar = {
+                id: this.pagocliente.id,
+                tesis: this.pagocliente.tesis_id,
+                monto_tesis: this.pagocliente.monto_tesis,
+                cuotas: this.pagocliente.cuotas_id,
+                cuotas_pagadas: this.pagocliente.cuotas_pagadas_id,
+                monto_cuotas: this.pagocliente.monto_cuotas,
+                fecha_pago_inicial: this.pagocliente.fecha_pago_inicial,
+                fecha_pago_final: this.pagocliente.fecha_pago_final,
+                estado_pago: this.pagocliente.estado_pagos_id,
+                estado: this.pagocliente.estado_id,
+                fecha_creacion: this.pagocliente.fecha_creacion,
+                fecha_modificacion: this.pagocliente.fecha_modificacion
             };
 
-            const response = this.accion === 1 ? await this.clienteService.createCliente(clienteParaEnviar) : await this.clienteService.updateCliente(this.cliente.id, clienteParaEnviar);
+            const response = this.accion === 1 ? await this.pago_clienteService.createPagosClientes(PagoClienteParaEnviar) : await this.pago_clienteService.updatePagosClientes(this.pagocliente.id, PagoClienteParaEnviar);
 
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
-            await this.cargarClientes();
+            await this.cargarPagosClientes();
             this.ocultarDialogo();
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Error inesperado';
@@ -250,12 +260,12 @@ export class Pagos_Clientes implements OnInit {
         }
     }
 
-    editarCliente(cliente: Cliente) {
-        this.cliente = { ...cliente };
+    editarPagoCliente(pagocliente: PC) {
+        this.pagocliente = { ...pagocliente };
         this.accion = 2;
-        this.clienteDialogo = true;
+        this.pagoclienteDialogo = true;
     }
-
+    /*
     async eliminarCliente(cliente: Cliente) {
         const id = cliente.id;
         this.isLoading = true;
