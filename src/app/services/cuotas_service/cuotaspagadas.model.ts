@@ -1,4 +1,4 @@
-export interface Estado {
+export interface Cuotaspagadas {
     id: number;
     nombre: string;
 }

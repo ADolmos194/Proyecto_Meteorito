@@ -27,6 +27,10 @@ import { PagosClientesService } from '@/services/pagos_clientes_service/pagos_cl
 import { tesisclienteuniversidad_activas } from '@/services/tesis_service/tesisclienteuniversidadactivas.model';
 import { TesisService } from '@/services/tesis_service/tesis.service';
 import { EstadoPago } from '@/services/estado_service/estadopago.model';
+import { DatePickerModule } from 'primeng/datepicker';
+import { CuotasService } from '@/services/cuotas_service/cuotas.service';
+import { Cuotas } from '@/services/cuotas_service/cuotas.model';
+import { Cuotaspagadas } from '@/services/cuotas_service/cuotaspagadas.model';
 
 interface Column {
     field: string;
@@ -60,6 +64,7 @@ interface ExportColumn {
         InputNumberModule,
         DialogModule,
         TagModule,
+        DatePickerModule ,
         InputIconModule,
         IconFieldModule,
         ConfirmDialogModule
@@ -80,8 +85,8 @@ export class Pagos_Clientes implements OnInit {
         monto_cuotas: 0,
         fecha_pago_inicial: '',
         fecha_pago_final: '',
-        estado_pagos_id: 0,
-        estado_id: 0,
+        estado_pagos_id: 1,
+        estado_id: 1,
         fecha_creacion: '',
         fecha_modificacion: '',
     };
@@ -93,6 +98,8 @@ export class Pagos_Clientes implements OnInit {
     opcionesEstado: Estado[] = [];
     opcionesEstadoPago: EstadoPago[] = [];
     opcionesTesisClientesUniversidad_Activas: tesisclienteuniversidad_activas[] = [];
+    opcionesCuotas: Cuotas[] = [];
+    opcionesCuotasPagadas: Cuotaspagadas[] = [];
     estado = [
         { label: 'ACTIVO', value: 1 },
         { label: 'INACTIVO', value: 2 }
@@ -103,16 +110,26 @@ export class Pagos_Clientes implements OnInit {
         { label: 'PENDIENTE', value: 2 }
     ];
 
+
+
+
     onGlobalFilter(table: any, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
     }
+
+
+    FechaActual: Date;
+
 
     constructor(
         private pago_clienteService: PagosClientesService,
         private messageService: MessageService,
         private estadoService: EstadoService,
-        private tesisService: TesisService
-    ) {}
+        private tesisService: TesisService,
+        private cuotasService: CuotasService,
+    ) {
+        this.FechaActual = new Date();
+    }
 
     async cargarPagosClientes() {
         this.isLoading = true;
@@ -143,6 +160,8 @@ export class Pagos_Clientes implements OnInit {
     async ngOnInit() {
         this.isLoading = true;
         try {
+            await Promise.all([this.cargarOpciones(this.cuotasService.getCuotasPagadas.bind(this.cuotasService), this.opcionesCuotasPagadas, 'Cuotas pagadas')]);
+            await Promise.all([this.cargarOpciones(this.cuotasService.getCuotas.bind(this.cuotasService), this.opcionesCuotas, 'Cuotas')]);
             await Promise.all([this.cargarOpciones(this.tesisService.getTesisClientesUniversidadActivas.bind(this.estadoService), this.opcionesTesisClientesUniversidad_Activas, 'estado')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstadoPagos.bind(this.estadoService), this.opcionesEstadoPago, 'estado pago')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
@@ -171,7 +190,7 @@ export class Pagos_Clientes implements OnInit {
             monto_cuotas: 0,
             fecha_pago_inicial: '',
             fecha_pago_final: '',
-            estado_pagos_id: 0,
+            estado_pagos_id: 1,
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: ''
@@ -229,7 +248,6 @@ export class Pagos_Clientes implements OnInit {
 
     async guardarPagosClientes() {
         this.enviar = true;
-
         this.isLoading = true;
         try {
             const PagoClienteParaEnviar = {
@@ -241,13 +259,15 @@ export class Pagos_Clientes implements OnInit {
                 monto_cuotas: this.pagocliente.monto_cuotas,
                 fecha_pago_inicial: this.pagocliente.fecha_pago_inicial,
                 fecha_pago_final: this.pagocliente.fecha_pago_final,
-                estado_pago: this.pagocliente.estado_pagos_id,
+                estado_pagos: this.pagocliente.estado_pagos_id,
                 estado: this.pagocliente.estado_id,
                 fecha_creacion: this.pagocliente.fecha_creacion,
                 fecha_modificacion: this.pagocliente.fecha_modificacion
             };
 
-            const response = this.accion === 1 ? await this.pago_clienteService.createPagosClientes(PagoClienteParaEnviar) : await this.pago_clienteService.updatePagosClientes(this.pagocliente.id, PagoClienteParaEnviar);
+            const response = this.accion === 1 ?
+                await this.pago_clienteService.createPagosClientes(PagoClienteParaEnviar) :
+                await this.pago_clienteService.updatePagosClientes(this.pagocliente.id, PagoClienteParaEnviar);
 
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
             await this.cargarPagosClientes();
@@ -260,24 +280,25 @@ export class Pagos_Clientes implements OnInit {
         }
     }
 
+
     editarPagoCliente(pagocliente: PC) {
         this.pagocliente = { ...pagocliente };
         this.accion = 2;
         this.pagoclienteDialogo = true;
     }
-    /*
-    async eliminarCliente(cliente: Cliente) {
-        const id = cliente.id;
+
+    async eliminarPagoCliente(pagocliente: PC) {
+        const id = pagocliente.id;
         this.isLoading = true;
         try {
-            const response = await this.clienteService.deleteCliente(id);
+            const response = await this.pago_clienteService.deletePagosClientes(id);
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarClientes();
+            await this.cargarPagosClientes();
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Error inesperado';
             this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
         } finally {
             this.isLoading = false;
         }
-    }*/
+    }
 }

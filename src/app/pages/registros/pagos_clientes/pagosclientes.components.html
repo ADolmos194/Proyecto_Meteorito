@@ -73,8 +73,8 @@
                     <p-tableCheckbox [value]="pagocliente" />
                 </td>
                 <td>
-                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" />
-                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" />
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarPagoCliente(pagocliente)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarPagoCliente(pagocliente)"/>
                 </td>
                 <td>{{ pagocliente.nombre_cliente_universidad }}</td>
                 <td>{{ pagocliente.monto_tesis }}</td>
@@ -99,7 +99,8 @@
 </div>
 <div class="card">
     <p-drawer [(visible)]="pagoclienteDialogo" [style]="{ width: '450px' }"
-        [header]="accion === 1 ? 'Nuevo pago de cliente' : 'Actualizar pago de cliente'" [modal]="true" position="right">
+        [header]="accion === 1 ? 'Nuevo pago de cliente' : 'Actualizar pago de cliente'" [modal]="true"
+        position="right">
         <ng-template #content>
             <div class="flex flex-col gap-6">
                 <div>
@@ -118,9 +119,47 @@
                         requerido</small>
                 </div>
                 <div>
+                    <label for="cuotas_id" class="block font-bold mb-3">Cuotas</label>
+                    <p-select [(ngModel)]="pagocliente.cuotas_id" inputId="cuotas_id"
+                        [options]="opcionesCuotas" optionLabel="nombre" optionValue="id"
+                        placeholder="Selecciona la cantidad de cuotas" fluid />
+                    <small class="text-red-500" *ngIf="enviar && !pagocliente.cuotas_id">Cantidad de cuotas es
+                        requerido</small>
+                </div>
+                <div>
+                    <label for="cuotas_pagadas_id" class="block font-bold mb-3">Cuotas pagadas</label>
+                    <p-select [(ngModel)]="pagocliente.cuotas_pagadas_id" inputId="cuotas_pagadas_id"
+                        [options]="opcionesCuotasPagadas" optionLabel="nombre" optionValue="id"
+                        placeholder="Selecciona la cantidad cuotas pagadas" fluid />
+                    <small class="text-red-500" *ngIf="enviar && !pagocliente.cuotas_pagadas_id">Cantidad de cuotas pagadas es
+                        requerido</small>
+                </div>
+                <div>
+                    <label for="monto_cuotas" class="block font-bold mb-3">Monto de cuotas</label>
+                    <input type="text" pInputText [(ngModel)]="pagocliente.monto_cuotas" id="monto_cuotas" required
+                        fluid />
+                    <small class="text-red-500" *ngIf="enviar && !pagocliente.monto_cuotas">Monto de la tesis es
+                        requerido</small>
+                </div>
+                <div class="flex gap-4 justify-between">
+                    <div class="flex-auto">
+                        <label for="fecha_pago_inicial" class="font-bold block mb-2">Fecha inicial</label>
+                        <p-datepicker [(ngModel)]="pagocliente.fecha_pago_inicial" [showIcon]="true" inputId="fecha_pago_inicial"
+                            [showButtonBar]="true" />
+                    </div>
+                    <div class="flex-auto">
+                        <label for="fecha_pago_final" class="font-bold block mb-2">Fecha final</label>
+                        <p-datepicker [(ngModel)]="pagocliente.fecha_pago_final" [showIcon]="true" inputId="fecha_pago_final"
+                            [showButtonBar]="true"/>
+                    </div>
+                </div>
+
+
+                <div>
                     <label for="estado_pagos_id" class="block font-bold mb-3">Estado de Pago</label>
-                    <p-select [(ngModel)]="pagocliente.estado_pagos_id" inputId="estado_pagos_id" [options]="opcionesEstadoPago"
-                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado de pago" appendTo="body" fluid />
+                    <p-select [(ngModel)]="pagocliente.estado_pagos_id" inputId="estado_pagos_id"
+                        [options]="opcionesEstadoPago" optionLabel="nombre" optionValue="id"
+                        placeholder="Seleccionar estado de pago" appendTo="body" fluid />
                 </div>
                 <div *ngIf="accion === 2">
                     <label for="estado_id" class="block font-bold mb-3">Estado</label>
@@ -133,7 +172,8 @@
         <ng-template #footer>
             <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
                 (click)="ocultarDialogo()" />
-            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarPagosClientes()" [loading]="isLoading"/>
+            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info"
+                (click)="guardarPagosClientes()" [loading]="isLoading" />
         </ng-template>
 
     </p-drawer>
@@ -143,22 +183,23 @@
 
 
 <style>
-    .contenedor{
+    .contenedor {
         overflow-x: auto;
     }
+
     table {
         width: 100%;
         table-layout: auto;
         border-collapse: collapse;
     }
 
-    td{
+    td {
         white-space: nowrap;
         overflow: hidden;
         max-width: auto;
     }
 
-    th{
+    th {
         white-space: nowrap;
         overflow: hidden;
         max-width: auto;
