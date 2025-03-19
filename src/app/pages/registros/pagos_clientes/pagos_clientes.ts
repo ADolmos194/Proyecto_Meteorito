@@ -245,11 +245,19 @@ export class Pagos_Clientes implements OnInit {
                 return 'info';
         }
     }
+    formatDate(date: any): string {
+        if (!date) return '';
+        const d = new Date(date);
+        return d.toISOString().split('T')[0]; // Retorna en formato YYYY-MM-DD
+    }
 
     async guardarPagosClientes() {
         this.enviar = true;
         this.isLoading = true;
+
+
         try {
+
             const PagoClienteParaEnviar = {
                 id: this.pagocliente.id,
                 tesis: this.pagocliente.tesis_id,
@@ -257,8 +265,8 @@ export class Pagos_Clientes implements OnInit {
                 cuotas: this.pagocliente.cuotas_id,
                 cuotas_pagadas: this.pagocliente.cuotas_pagadas_id,
                 monto_cuotas: this.pagocliente.monto_cuotas,
-                fecha_pago_inicial: this.pagocliente.fecha_pago_inicial,
-                fecha_pago_final: this.pagocliente.fecha_pago_final,
+                fecha_pago_inicial: this.formatDate(this.pagocliente.fecha_pago_inicial),
+                fecha_pago_final: this.formatDate(this.pagocliente.fecha_pago_final),
                 estado_pagos: this.pagocliente.estado_pagos_id,
                 estado: this.pagocliente.estado_id,
                 fecha_creacion: this.pagocliente.fecha_creacion,
@@ -282,10 +290,16 @@ export class Pagos_Clientes implements OnInit {
 
 
     editarPagoCliente(pagocliente: PC) {
-        this.pagocliente = { ...pagocliente };
+        this.pagocliente = {
+            ...pagocliente,
+            fecha_pago_inicial: pagocliente.fecha_pago_inicial ? new Date(pagocliente.fecha_pago_inicial).toISOString().split('T')[0] : '',
+            fecha_pago_final: pagocliente.fecha_pago_final ? new Date(pagocliente.fecha_pago_final).toISOString().split('T')[0] : ''
+        };
         this.accion = 2;
         this.pagoclienteDialogo = true;
     }
+
+
 
     async eliminarPagoCliente(pagocliente: PC) {
         const id = pagocliente.id;
@@ -301,4 +315,5 @@ export class Pagos_Clientes implements OnInit {
             this.isLoading = false;
         }
     }
+
 }
