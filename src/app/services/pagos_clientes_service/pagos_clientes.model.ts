@@ -1,13 +1,9 @@
 export interface PC {
     id: number;
     tesis_id : number;
+    nombre_cliente_universidad: string;
     monto_tesis : number;
-    cuotas_id : number;
-    cuotas_pagadas_id : number;
-    monto_cuotas : number;
-    fecha_pago_inicial : string;
-    fecha_pago_final : string;
-    estado_pagos_id : number;
+    cuotas : string;
     estado_id : number;
     fecha_creacion : string;
     fecha_modificacion: string;

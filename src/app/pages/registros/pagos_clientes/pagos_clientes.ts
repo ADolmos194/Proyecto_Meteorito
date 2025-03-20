@@ -3,6 +3,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
@@ -28,9 +29,10 @@ import { tesisclienteuniversidad_activas } from '@/services/tesis_service/tesisc
 import { TesisService } from '@/services/tesis_service/tesis.service';
 import { EstadoPago } from '@/services/estado_service/estadopago.model';
 import { DatePickerModule } from 'primeng/datepicker';
-import { CuotasService } from '@/services/cuotas_service/cuotas.service';
-import { Cuotas } from '@/services/cuotas_service/cuotas.model';
-import { Cuotaspagadas } from '@/services/cuotas_service/cuotaspagadas.model';
+import { DataView } from 'primeng/dataview';
+import { Tag } from 'primeng/tag';
+import { Rating } from 'primeng/rating';
+import { SelectButton } from 'primeng/selectbutton';
 
 interface Column {
     field: string;
@@ -53,6 +55,7 @@ interface ExportColumn {
         FormsModule,
         ButtonModule,
         CheckboxModule,
+        CardModule,
         RippleModule,
         ToastModule,
         ToolbarModule,
@@ -67,7 +70,9 @@ interface ExportColumn {
         DatePickerModule ,
         InputIconModule,
         IconFieldModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        DataView,
+        Tag,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     templateUrl: './pagosclientes.components.html',
@@ -79,13 +84,9 @@ export class Pagos_Clientes implements OnInit {
     pagocliente: PC = {
         id: 0,
         tesis_id: 0,
+        nombre_cliente_universidad: '',
         monto_tesis: 0,
-        cuotas_id: 0,
-        cuotas_pagadas_id: 0,
-        monto_cuotas: 0,
-        fecha_pago_inicial: '',
-        fecha_pago_final: '',
-        estado_pagos_id: 1,
+        cuotas: '',
         estado_id: 1,
         fecha_creacion: '',
         fecha_modificacion: '',
@@ -98,8 +99,6 @@ export class Pagos_Clientes implements OnInit {
     opcionesEstado: Estado[] = [];
     opcionesEstadoPago: EstadoPago[] = [];
     opcionesTesisClientesUniversidad_Activas: tesisclienteuniversidad_activas[] = [];
-    opcionesCuotas: Cuotas[] = [];
-    opcionesCuotasPagadas: Cuotaspagadas[] = [];
     estado = [
         { label: 'ACTIVO', value: 1 },
         { label: 'INACTIVO', value: 2 }
@@ -110,6 +109,9 @@ export class Pagos_Clientes implements OnInit {
         { label: 'PENDIENTE', value: 2 }
     ];
 
+    layout: string = 'grid';
+
+    options = ['grid'];
 
 
 
@@ -118,17 +120,12 @@ export class Pagos_Clientes implements OnInit {
     }
 
 
-    FechaActual: Date;
-
-
     constructor(
         private pago_clienteService: PagosClientesService,
         private messageService: MessageService,
         private estadoService: EstadoService,
         private tesisService: TesisService,
-        private cuotasService: CuotasService,
     ) {
-        this.FechaActual = new Date();
     }
 
     async cargarPagosClientes() {
@@ -160,8 +157,6 @@ export class Pagos_Clientes implements OnInit {
     async ngOnInit() {
         this.isLoading = true;
         try {
-            await Promise.all([this.cargarOpciones(this.cuotasService.getCuotasPagadas.bind(this.cuotasService), this.opcionesCuotasPagadas, 'Cuotas pagadas')]);
-            await Promise.all([this.cargarOpciones(this.cuotasService.getCuotas.bind(this.cuotasService), this.opcionesCuotas, 'Cuotas')]);
             await Promise.all([this.cargarOpciones(this.tesisService.getTesisClientesUniversidadActivas.bind(this.estadoService), this.opcionesTesisClientesUniversidad_Activas, 'estado')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstadoPagos.bind(this.estadoService), this.opcionesEstadoPago, 'estado pago')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
@@ -184,13 +179,9 @@ export class Pagos_Clientes implements OnInit {
         this.pagocliente = {
             id: 0,
             tesis_id: 0,
+            nombre_cliente_universidad: '',
             monto_tesis: 0,
-            cuotas_id: 0,
-            cuotas_pagadas_id: 0,
-            monto_cuotas: 0,
-            fecha_pago_inicial: '',
-            fecha_pago_final: '',
-            estado_pagos_id: 1,
+            cuotas: '',
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: ''
@@ -224,6 +215,7 @@ export class Pagos_Clientes implements OnInit {
         }
     }
 
+    /*
     getEstadoPago(estado_pago_id: number): string {
         switch (estado_pago_id) {
             case 1:
@@ -245,12 +237,16 @@ export class Pagos_Clientes implements OnInit {
                 return 'info';
         }
     }
+
     formatDate(date: any): string {
         if (!date) return '';
         const d = new Date(date);
         return d.toISOString().split('T')[0]; // Retorna en formato YYYY-MM-DD
     }
 
+    fecha_pago_inicial: pagocliente.fecha_pago_inicial ? new Date(pagocliente.fecha_pago_inicial).toISOString().split('T')[0] : '',
+    fecha_pago_final: pagocliente.fecha_pago_final ? new Date(pagocliente.fecha_pago_final).toISOString().split('T')[0] : ''
+    */
     async guardarPagosClientes() {
         this.enviar = true;
         this.isLoading = true;
@@ -262,12 +258,7 @@ export class Pagos_Clientes implements OnInit {
                 id: this.pagocliente.id,
                 tesis: this.pagocliente.tesis_id,
                 monto_tesis: this.pagocliente.monto_tesis,
-                cuotas: this.pagocliente.cuotas_id,
-                cuotas_pagadas: this.pagocliente.cuotas_pagadas_id,
-                monto_cuotas: this.pagocliente.monto_cuotas,
-                fecha_pago_inicial: this.formatDate(this.pagocliente.fecha_pago_inicial),
-                fecha_pago_final: this.formatDate(this.pagocliente.fecha_pago_final),
-                estado_pagos: this.pagocliente.estado_pagos_id,
+                cuotas: this.pagocliente.cuotas,
                 estado: this.pagocliente.estado_id,
                 fecha_creacion: this.pagocliente.fecha_creacion,
                 fecha_modificacion: this.pagocliente.fecha_modificacion
@@ -290,11 +281,7 @@ export class Pagos_Clientes implements OnInit {
 
 
     editarPagoCliente(pagocliente: PC) {
-        this.pagocliente = {
-            ...pagocliente,
-            fecha_pago_inicial: pagocliente.fecha_pago_inicial ? new Date(pagocliente.fecha_pago_inicial).toISOString().split('T')[0] : '',
-            fecha_pago_final: pagocliente.fecha_pago_final ? new Date(pagocliente.fecha_pago_final).toISOString().split('T')[0] : ''
-        };
+        this.pagocliente = {...pagocliente};
         this.accion = 2;
         this.pagoclienteDialogo = true;
     }

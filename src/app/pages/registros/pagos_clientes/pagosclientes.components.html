@@ -9,175 +9,117 @@
         <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
     </ng-template>
 </p-toolbar>
-<div class="contenedor">
-    <p-table #dt [value]="pagosclientes()" [rows]="10" [columns]="cols" [paginator]="true"
-        [globalFilterFields]="['tesis_id', 'monto_tesis', 'cuotas_id', 'cuotas_pagadas_id', 'monto_cuotas', 'fecha_pago_inicial', 'fecha_pago_final', 'estado_pagos_id','estado_id','fecha_creacion','fecha_modificacion']"
-        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarPagosClientes" [rowHover]="true" dataKey="id"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} pago de clientes"
-        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 20, 30]" [loading]="isLoading">
-        <ng-template #caption>
-            <div class="flex items-center justify-between">
-                <h5 class="m-0">Lista de pagos de clientes</h5>
-                <p-iconfield>
-                    <p-inputicon styleClass="pi pi-search" />
-                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
-                </p-iconfield>
-            </div>
-        </ng-template>
 
-        <ng-template #header>
-            <tr>
-                <th>
-                    <p-tableheadercheckbox />
-                </th>
-                <th>Opciones</th>
-                <th pSortableColumn="tesis_id">Cliente - Universidad
-                    <p-sorticon field="tesis_id" />
-                </th>
-                <th pSortableColumn="monto_tesis">Monto tesis
-                    <p-sorticon field="monto_tesis" />
-                </th>
-                <th pSortableColumn="cuotas_id">Cuantas Cuotas
-                    <p-sorticon field="cuotas_id" />
-                </th>
-                <th pSortableColumn="cuotas_pagadas_id">Cuotas pagadas
-                    <p-sorticon field="cuotas_pagadas_id" />
-                </th>
-                <th pSortableColumn="monto_cuotas">Monto cuotas
-                    <p-sorticon field="monto_cuotas" />
-                </th>
-                <th pSortableColumn="fecha_pago_inicial">Fecha pago inicial
-                    <p-sorticon field="fecha_pago_inicial" />
-                </th>
-                <th pSortableColumn="fecha_pago_final">Fecha pago final
-                    <p-sorticon field="fecha_pago_final" />
-                </th>
-                <th pSortableColumn="estado_pagos_id">Estado de pago
-                    <p-sorticon field="estado_pagos_id" />
-                </th>
-                <th pSortableColumn="estado_id">Estado
-                    <p-sorticon field="estado_id" />
-                </th>
-                <th pSortableColumn="fecha_creacion">Fecha creación
-                    <p-sorticon field="fecha_creacion" />
-                </th>
-                <th pSortableColumn="fecha_modificacion">Fecha modificación
-                    <p-sorticon field="fecha_modificacion" />
-                </th>
-            </tr>
-        </ng-template>
+<p-card>
+    <p-dataview #dv [value]="pagosclientes()" layout="grid" [paginator]="true" [rows]="12" >
+        <ng-template #grid let-pagocliente>
+            <div class="grid grid-cols-12 gap-4">
+                <div *ngFor="let pagocliente of pagosclientes()" class="col-span-12 sm:col-span-5 md:col-span-5 xl:col-span-5 p-2">
+                    <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col">
+                        <div class="pt-1">
+                            <div class="flex flex-row justify-between  items-center mb-4 ">
+                                <div>
+                                    <div class="text-lg font-bold mt-1">{{pagocliente.nombre_cliente_universidad}}</div>
+                                </div>
+                                    <div class="bg-surface-50 flex justify-content rounded p-3">
+                                        <div class="relative mx-auto">
+                                            <p-tag
+                                                [value]="getEstado(pagocliente.estado_id)"
+                                                [severity]="getEstadoSeverity(pagocliente.estado_id)"
+                                                styleClass="dark:!bg-surface-900"
+                                            />
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="flex flex-col gap-6 mt-6">
+                                <span class="text-2xl font-bold"> {{ pagocliente.monto_tesis}} S/.</span>
+                                <span class="text-surface-900 font-bold ">{{ pagocliente.cuotas }}</span>
+                            </div>
 
-        <ng-template #body let-pagocliente>
-            <tr>
-                <td>
-                    <p-tableCheckbox [value]="pagocliente" />
-                </td>
-                <td>
-                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarPagoCliente(pagocliente)" />
-                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarPagoCliente(pagocliente)"/>
-                </td>
-                <td>{{ pagocliente.nombre_cliente_universidad }}</td>
-                <td>{{ pagocliente.monto_tesis }}</td>
-                <td>{{ pagocliente.cuotasnombre }}</td>
-                <td>{{ pagocliente.cuotaspagadasnombre }}</td>
-                <td>{{ pagocliente.monto_cuotas }}</td>
-                <td>{{ pagocliente.fecha_pago_inicial }}</td>
-                <td>{{ pagocliente.fecha_pago_final }}</td>
-                <td>
-                    <p-tag [value]="getEstadoPago(pagocliente.estado_pagos_id)"
-                        [severity]="getEstadoPagoSeverity(pagocliente.estado_pagos_id)" />
-                </td>
-                <td>
-                    <p-tag [value]="getEstado(pagocliente.estado_id)"
-                        [severity]="getEstadoSeverity(pagocliente.estado_id)" />
-                </td>
-                <td>{{ pagocliente.fecha_creacion }}</td>
-                <td>{{ pagocliente.fecha_modificacion }}</td>
-            </tr>
-        </ng-template>
-    </p-table>
-</div>
-<div class="card">
-    <p-drawer [(visible)]="pagoclienteDialogo" [style]="{ width: '450px' }"
-        [header]="accion === 1 ? 'Nuevo pago de cliente' : 'Actualizar pago de cliente'" [modal]="true"
-        position="right">
-        <ng-template #content>
-            <div class="flex flex-col gap-6">
-                <div>
-                    <label for="tesis_id" class="block font-bold mb-3">Cliente - Universidad</label>
-                    <p-select [(ngModel)]="pagocliente.tesis_id" inputId="tesis_id"
-                        [options]="opcionesTesisClientesUniversidad_Activas" optionLabel="nombre" optionValue="id"
-                        placeholder="Selecciona el Cliente - Universidad" fluid />
-                    <small class="text-red-500" *ngIf="enviar && !pagocliente.tesis_id">El Cliente - Universidad es
-                        requerido</small>
-                </div>
-                <div>
-                    <label for="monto_tesis" class="block font-bold mb-3">Monto de la tesis</label>
-                    <input type="text" pInputText [(ngModel)]="pagocliente.monto_tesis" id="monto_tesis" required
-                        fluid />
-                    <small class="text-red-500" *ngIf="enviar && !pagocliente.monto_tesis">Monto de la tesis es
-                        requerido</small>
-                </div>
-                <div>
-                    <label for="cuotas_id" class="block font-bold mb-3">Cuotas</label>
-                    <p-select [(ngModel)]="pagocliente.cuotas_id" inputId="cuotas_id"
-                        [options]="opcionesCuotas" optionLabel="nombre" optionValue="id"
-                        placeholder="Selecciona la cantidad de cuotas" fluid />
-                    <small class="text-red-500" *ngIf="enviar && !pagocliente.cuotas_id">Cantidad de cuotas es
-                        requerido</small>
-                </div>
-                <div>
-                    <label for="cuotas_pagadas_id" class="block font-bold mb-3">Cuotas pagadas</label>
-                    <p-select [(ngModel)]="pagocliente.cuotas_pagadas_id" inputId="cuotas_pagadas_id"
-                        [options]="opcionesCuotasPagadas" optionLabel="nombre" optionValue="id"
-                        placeholder="Selecciona la cantidad cuotas pagadas" fluid />
-                    <small class="text-red-500" *ngIf="enviar && !pagocliente.cuotas_pagadas_id">Cantidad de cuotas pagadas es
-                        requerido</small>
-                </div>
-                <div>
-                    <label for="monto_cuotas" class="block font-bold mb-3">Monto de cuotas</label>
-                    <input type="text" pInputText [(ngModel)]="pagocliente.monto_cuotas" id="monto_cuotas" required
-                        fluid />
-                    <small class="text-red-500" *ngIf="enviar && !pagocliente.monto_cuotas">Monto de la tesis es
-                        requerido</small>
-                </div>
-                <div class="flex gap-4 justify-between">
-                    <div class="flex-auto">
-                        <label for="fecha_pago_inicial" class="font-bold block mb-2">Fecha inicial</label>
-                        <p-datepicker [(ngModel)]="pagocliente.fecha_pago_inicial" [showIcon]="true" inputId="fecha_pago_inicial"
-                            [showButtonBar]="true" dateFormat="yy-mm-dd"/>
+                            <div class="flex flex-col gap-6 mt-6">
+                                <div class="flex justify-between items-center">
+                                <div class="flex gap-2">
+                                    <td>
+                                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarPagoCliente(pagocliente)" />
+                                        <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarPagoCliente(pagocliente)"/>
+                                        <p-button label="Agregar Detalle" icon="pi pi-plus" severity="info" [rounded]="true" [outlined]="true"/>
+                                    </td>
+                                </div></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex-auto">
-                        <label for="fecha_pago_final" class="font-bold block mb-2">Fecha final</label>
-                        <p-datepicker [(ngModel)]="pagocliente.fecha_pago_final" [showIcon]="true" inputId="fecha_pago_final"
-                            [showButtonBar]="true" dateFormat="yy-mm-dd"/>
-                    </div>
-                </div>
-
-
-                <div>
-                    <label for="estado_pagos_id" class="block font-bold mb-3">Estado de Pago</label>
-                    <p-select [(ngModel)]="pagocliente.estado_pagos_id" inputId="estado_pagos_id"
-                        [options]="opcionesEstadoPago" optionLabel="nombre" optionValue="id"
-                        placeholder="Seleccionar estado de pago" appendTo="body" fluid />
-                </div>
-                <div *ngIf="accion === 2">
-                    <label for="estado_id" class="block font-bold mb-3">Estado</label>
-                    <p-select [(ngModel)]="pagocliente.estado_id" inputId="estado_id" [options]="opcionesEstado"
-                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
                 </div>
             </div>
         </ng-template>
+    </p-dataview>
+</p-card>
 
-        <ng-template #footer>
-            <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
-                (click)="ocultarDialogo()" />
-            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info"
-                (click)="guardarPagosClientes()" [loading]="isLoading" />
-        </ng-template>
+<p-drawer [(visible)]="pagoclienteDialogo" [style]="{ width: '450px' }"
+    [header]="accion === 1 ? 'Nuevo pago de cliente' : 'Actualizar pago de cliente'" [modal]="true" position="right">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="tesis_id" class="block font-bold mb-3">Cliente - Universidad</label>
+                <p-select [(ngModel)]="pagocliente.tesis_id" inputId="tesis_id"
+                    [options]="opcionesTesisClientesUniversidad_Activas" optionLabel="nombre" optionValue="id"
+                    placeholder="Selecciona el Cliente - Universidad" fluid />
+                <small class="text-red-500" *ngIf="enviar && !pagocliente.tesis_id">El Cliente - Universidad es
+                    requerido</small>
+            </div>
+            <div>
+                <label for="monto_tesis" class="block font-bold mb-3">Monto de la tesis</label>
+                <input type="text" pInputText [(ngModel)]="pagocliente.monto_tesis" id="monto_tesis" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !pagocliente.monto_tesis">Monto de la tesis es
+                    requerido</small>
+            </div>
+            <div>
+                <label for="cuotas" class="block font-bold mb-3">Cuantas cuotas?</label>
+                <input type="text" pInputText [(ngModel)]="pagocliente.cuotas" id="cuotas" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !pagocliente.cuotas">Cantidad de cuotas es
+                    requerido</small>
+            </div>
+            <p-table
+                    showGridlines
+                    [tableStyle]="{ 'min-width': '40rem' }">
+                        <ng-template #header>
+                            <tr>
+                                <th>Acciones</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body>
+                            <tr>
+                                <td>
+                                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarPagoCliente(pagocliente)" />
+                                    <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarPagoCliente(pagocliente)"/>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </ng-template>
+            </p-table>
+            <div *ngIf="accion === 2">
+                <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                <p-select [(ngModel)]="pagocliente.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+        </div>
+    </ng-template>
 
-    </p-drawer>
-</div>
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
+            (click)="ocultarDialogo()" />
+        <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarPagosClientes()"
+            [loading]="isLoading" />
+    </ng-template>
+
+</p-drawer>
+
 
 <p-confirmdialog [style]="{ width: '450px' }" />
 
