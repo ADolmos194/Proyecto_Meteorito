@@ -33,7 +33,7 @@ import { DataView } from 'primeng/dataview';
 import { Tag } from 'primeng/tag';
 import { Rating } from 'primeng/rating';
 import { SelectButton } from 'primeng/selectbutton';
-
+import { Skeleton } from 'primeng/skeleton';
 interface Column {
     field: string;
     header: string;
@@ -73,6 +73,8 @@ interface ExportColumn {
         ConfirmDialogModule,
         DataView,
         Tag,
+        SelectButton,
+        Skeleton,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     templateUrl: './pagosclientes.components.html',
