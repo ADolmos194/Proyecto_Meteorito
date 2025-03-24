@@ -34,6 +34,9 @@ import { Tag } from 'primeng/tag';
 import { Rating } from 'primeng/rating';
 import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
+import {DividerModule} from 'primeng/divider';
+import { DetallesPagosClientesService } from '@/services/detalle_pago_clientes_service/detalles_pagos_clientes.service';
+import { DetallesPC } from '@/services/detalle_pago_clientes_service/detalles_pagos_clientes.model';
 interface Column {
     field: string;
     header: string;
@@ -75,10 +78,11 @@ interface ExportColumn {
         Tag,
         SelectButton,
         Skeleton,
+        DividerModule,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     templateUrl: './pagosclientes.components.html',
-    providers: [MessageService, PagosClientesService, ConfirmationService]
+    providers: [MessageService, PagosClientesService, ConfirmationService, DetallesPagosClientesService]
 })
 export class Pagos_Clientes implements OnInit {
     pagoclienteDialogo: boolean = false;
@@ -121,12 +125,13 @@ export class Pagos_Clientes implements OnInit {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
     }
 
-
     constructor(
         private pago_clienteService: PagosClientesService,
+        private detalle_pago_clienteService: DetallesPagosClientesService,
         private messageService: MessageService,
         private estadoService: EstadoService,
         private tesisService: TesisService,
+
     ) {
     }
 
@@ -163,6 +168,7 @@ export class Pagos_Clientes implements OnInit {
             await Promise.all([this.cargarOpciones(this.estadoService.getEstadoPagos.bind(this.estadoService), this.opcionesEstadoPago, 'estado pago')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             await this.cargarPagosClientes();
+            await this.cargarDetallePagosClientes();
         } catch (error) {
             console.error('Error al cargar los clientes:', error);
         } finally {
@@ -218,28 +224,6 @@ export class Pagos_Clientes implements OnInit {
     }
 
     /*
-    getEstadoPago(estado_pago_id: number): string {
-        switch (estado_pago_id) {
-            case 1:
-                return 'CANCELADO';
-            case 2:
-                return 'PENDIENTE';
-            default:
-                return 'ELIMINADO';
-        }
-    }
-
-    getEstadoPagoSeverity(estado_pago_id: number): 'success' | 'danger' | 'info' {
-        switch (estado_pago_id) {
-            case 1:
-                return 'success';
-            case 2:
-                return 'danger';
-            default:
-                return 'info';
-        }
-    }
-
     formatDate(date: any): string {
         if (!date) return '';
         const d = new Date(date);
@@ -249,6 +233,7 @@ export class Pagos_Clientes implements OnInit {
     fecha_pago_inicial: pagocliente.fecha_pago_inicial ? new Date(pagocliente.fecha_pago_inicial).toISOString().split('T')[0] : '',
     fecha_pago_final: pagocliente.fecha_pago_final ? new Date(pagocliente.fecha_pago_final).toISOString().split('T')[0] : ''
     */
+
     async guardarPagosClientes() {
         this.enviar = true;
         this.isLoading = true;
@@ -281,14 +266,11 @@ export class Pagos_Clientes implements OnInit {
         }
     }
 
-
     editarPagoCliente(pagocliente: PC) {
         this.pagocliente = {...pagocliente};
         this.accion = 2;
         this.pagoclienteDialogo = true;
     }
-
-
 
     async eliminarPagoCliente(pagocliente: PC) {
         const id = pagocliente.id;
@@ -302,6 +284,79 @@ export class Pagos_Clientes implements OnInit {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    /* ---------------------------- DETALLE DE PAGO CLIENTES ----------------------------- */
+
+    accionDetalle: number = 1;
+    DetallepagoclienteDialogo: boolean = false;
+    enviarDetalle: boolean = false;
+    isLoadingDetalle: boolean = false;
+    detallespagosclientes = signal<DetallesPC[]>([]);
+    detallepagocliente: DetallesPC = {
+        id: 0,
+        pagosclientes_id : 0,
+        cuotaspagadas: '',
+        monto_cuotas : 0,
+        fecha_pago : '',
+        estado_pago_id: 1,
+        estado_id: 1,
+        fecha_creacion : '',
+        fecha_modificacion: '',
+    };
+
+
+    abrirDetalleNuevo() {
+        this.accionDetalle = 1;
+        this.enviarDetalle = false;
+        this.limpiarDatosDetalles();
+        this.DetallepagoclienteDialogo = true;
+    }
+
+    limpiarDatosDetalles() {
+    }
+
+    ocultarDetalleDialogo() {
+        this.DetallepagoclienteDialogo = false;
+        this.enviarDetalle = false;
+    }
+
+    async guardarDetallePagosClientes() {
+        this.isLoadingDetalle = true;
+        try {} catch (error: unknown) {} finally {}
+    }
+
+    getEstadoPago(estado_pago_id: number): string {
+        switch (estado_pago_id) {
+            case 1:
+                return 'CANCELADO';
+            case 2:
+                return 'PENDIENTE';
+            default:
+                return 'ELIMINADO';
+        }
+    }
+
+    getEstadoPagoSeverity(estado_pago_id: number): 'success' | 'danger' | 'info' {
+        switch (estado_pago_id) {
+            case 1:
+                return 'success';
+            case 2:
+                return 'danger';
+            default:
+                return 'info';
+        }
+    }
+
+    async cargarDetallePagosClientes() {
+        this.isLoadingDetalle = true;
+        try {
+            const response: DetallesPC[] = await this.detalle_pago_clienteService.getDetallesPagosClientes();
+            console.log(response);
+            this.detallespagosclientes.set(response);
+        } catch (error) {
+            console.error('Error al cargar los pagos de los clientes:', error);
         }
     }
 

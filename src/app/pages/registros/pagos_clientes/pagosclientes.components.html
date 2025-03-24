@@ -11,11 +11,21 @@
 </p-toolbar>
 
 <p-card>
-    <p-dataview #dv [value]="pagosclientes()" layout="grid" [rows]="10" [columns]="cols" [paginator]="true"
-        [rowHover]="true" dataKey="id" [loading]="isLoading" loadingIcon="pi pi-spinner"
+    <p-dataview
+        #dv
+        [value]="pagosclientes()"
+        layout="grid"
+        [rows]="10"
+        [columns]="cols"
+        [paginator]="true"
+        [rowHover]="true"
+        dataKey="id"
+        [loading]="isLoading"
+        loadingIcon="pi pi-spinner"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} pagos de clientes"
-        [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 20, 30]">
-
+        [showCurrentPageReport]="true"
+        [rowsPerPageOptions]="[10, 20, 30]"
+    >
         <ng-template #header>
             <div class="flex justify-between items-center">
                 <h5 class="m-0">Lista de pagos de clientes</h5>
@@ -49,8 +59,21 @@
 
                 <!-- Cuando termina de cargar, mostramos los datos -->
                 <ng-template #dataLoaded>
-                    <div *ngFor="let pagocliente of pagosclientes()" class="col-span-12 sm:col-span-5 md:col-span-5 xl:col-span-5 p-2">
+                    <div *ngFor="let pagocliente of pagosclientes()" class="col-span-12 sm:col-span-6 md:col-span-6 xl:col-span-6 p-2">
                         <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col">
+                            <div class="flex flex-col gap-6 mt-1">
+                                <div class="flex justify-between items-center flex-wrap">
+                                    <div class="flex gap-2 mb-4 sm:mb-0">
+                                        <p-button label="Editar" icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarPagoCliente(pagocliente)" />
+                                        <p-button label="Eliminar" icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarPagoCliente(pagocliente)" />
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <p-button label="Agregar detalle" icon="pi pi-plus" class="mr-2" severity="info" [rounded]="true" [outlined]="true" (onClick)="abrirDetalleNuevo()" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p-divider />
                             <div class="pt-1">
                                 <div class="flex flex-row justify-between items-center mb-4">
                                     <div>
@@ -66,14 +89,33 @@
                                     <span class="text-2xl font-bold"> {{ pagocliente.monto_tesis }} S/.</span>
                                     <span class="text-surface-900 font-bold">{{ pagocliente.cuotas }}</span>
                                 </div>
-                                <div class="flex flex-col gap-6 mt-6">
-                                    <div class="flex justify-between items-center">
-                                        <div class="flex gap-2">
-                                            <p-button label="Editar" icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarPagoCliente(pagocliente)" />
-                                            <p-button label="Eliminar" icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarPagoCliente(pagocliente)" />
-                                        </div>
-                                    </div>
-                                </div>
+                                <p-divider />
+
+                                <p-table [value]="detallespagosclientes()" showGridlines [tableStyle]="{ 'min-width': '40rem' }">
+                                    <ng-template #header>
+                                        <tr>
+                                            <th>Acciones</th>
+                                            <th>Cuotas pagadas</th>
+                                            <th>Monto cuotas</th>
+                                            <th>Fecha de pago</th>
+                                            <th>Estado de pago</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template #body let-detallepagocliente>
+                                        <tr>
+                                            <td>
+                                                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" />
+                                                <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" />
+                                            </td>
+                                            <td>{{detallepagocliente.cuotaspagadas}}</td>
+                                            <td>{{detallepagocliente.cuotaspagadas}}</td>
+                                            <td>{{detallepagocliente.cuotaspagadas}}</td>
+                                            <td>{{detallepagocliente.cuotaspagadas}}</td>
+                                            <td>{{detallepagocliente.cuotaspagadas}}</td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
                             </div>
                         </div>
                     </div>
@@ -82,6 +124,7 @@
         </ng-template>
     </p-dataview>
 </p-card>
+<!-- '"success" | "info" | "warn" | "danger" | "help" | "primary" | "secondary" |  -->
 
 <p-drawer [(visible)]="pagoclienteDialogo" [style]="{ width: '450px' }" [header]="accion === 1 ? 'Nuevo pago de cliente' : 'Actualizar pago de cliente'" [modal]="true" position="right">
     <ng-template #content>
@@ -101,33 +144,6 @@
                 <input type="text" pInputText [(ngModel)]="pagocliente.cuotas" id="cuotas" required fluid />
                 <small class="text-red-500" *ngIf="enviar && !pagocliente.cuotas">Cantidad de cuotas es requerido</small>
             </div>
-            <p-table showGridlines [tableStyle]="{ 'min-width': '40rem' }">
-                <ng-template #header>
-                    <tr>
-                        <th>Acciones</th>
-                        <th>Cuotas pagadas</th>
-                        <th>Monto cuotas</th>
-                        <th>Estado de pago</th>
-                        <th>Estado</th>
-                    </tr>
-                </ng-template>
-                <ng-template #body>
-                    <tr>
-                        <td>
-                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarPagoCliente(pagocliente)" />
-                            <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarPagoCliente(pagocliente)" />
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </ng-template>
-            </p-table>
-            <!-- '"success" | "info" | "warn" | "danger" | "help" | "primary" | "secondary" |  -->
-            <div>
-                <p-button label="Agregar fechas de pago" icon="pi pi-check" [raised]="true" severity="help"/>
-            </div>
             <div *ngIf="accion === 2">
                 <label for="estado_id" class="block font-bold mb-3">Estado</label>
                 <p-select [(ngModel)]="pagocliente.estado_id" inputId="estado_id" [options]="opcionesEstado" optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
@@ -137,11 +153,19 @@
 
     <ng-template #footer>
         <p-button label="Cancelar" class="mr-2" icon="pi pi-times" variant="text" [raised]="true" severity="danger" (click)="ocultarDialogo()" />
-        <p-button label="Guardar" class="mr-2" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarPagosClientes()" [loading]="isLoading"/>
+        <p-button label="Guardar" class="mr-2" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarPagosClientes()" [loading]="isLoading" />
     </ng-template>
 </p-drawer>
 
-<p-confirmdialog [style]="{ width: '450px' }" />
+<p-drawer [(visible)]="DetallepagoclienteDialogo" [style]="{ width: '450px' }" [header]="accionDetalle === 1 ? 'Nuevo Detalle Pago de cliente' : 'Actualizar Detalle Pago de cliente'" [modal]="true" position="right">
+    <ng-template #content>
+        <div class="flex flex-col gap-6"></div>
+    </ng-template>
+    <ng-template #footer>
+        <p-button label="Cancelar" class="mr-2" icon="pi pi-times" variant="text" [raised]="true" severity="danger" (click)="ocultarDetalleDialogo()" />
+        <p-button label="Guardar" class="mr-2" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarDetallePagosClientes()" [loading]="isLoading" />
+    </ng-template>
+</p-drawer>
 
 <style>
     .contenedor {
