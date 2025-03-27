@@ -73,6 +73,7 @@ export class Tesis implements OnInit {
     ttesiss: Tesi = {
         id: 0,
         clientes_id: 0,
+        nombre_completo:'',
         nombre_tesis: '',
         universidad: '',
         usuario_plataforma: '',
@@ -155,6 +156,7 @@ export class Tesis implements OnInit {
         this.ttesiss = {
             id: 0,
             clientes_id: 0,
+            nombre_completo:'',
             nombre_tesis: '',
             universidad: '',
             usuario_plataforma: '',

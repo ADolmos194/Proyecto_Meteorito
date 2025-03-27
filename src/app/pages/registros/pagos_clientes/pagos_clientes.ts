@@ -23,7 +23,7 @@ import { Estado } from '@/./services/estado_service/estado.model';
 import { CheckboxModule } from 'primeng/checkbox';
 import { EstadoService } from '@/services/estado_service/estado.service';
 import { DrawerModule } from 'primeng/drawer';
-import { PC } from '@/services/pagos_clientes_service/pagos_clientes.model';
+import { PC, DetallePago } from '@/services/pagos_clientes_service/pagos_clientes.model';
 import { PagosClientesService } from '@/services/pagos_clientes_service/pagos_clientes.service';
 import { tesisclienteuniversidad_activas } from '@/services/tesis_service/tesisclienteuniversidadactivas.model';
 import { TesisService } from '@/services/tesis_service/tesis.service';
@@ -36,7 +36,7 @@ import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
 import {DividerModule} from 'primeng/divider';
 import { DetallesPagosClientesService } from '@/services/detalle_pago_clientes_service/detalles_pagos_clientes.service';
-import { DetallesPC } from '@/services/detalle_pago_clientes_service/detalles_pagos_clientes.model';
+
 interface Column {
     field: string;
     header: string;
@@ -96,6 +96,7 @@ export class Pagos_Clientes implements OnInit {
         estado_id: 1,
         fecha_creacion: '',
         fecha_modificacion: '',
+        detalles_pago: []
     };
     seleccionarPagosClientes!: Pagos_Clientes[] | null;
     enviar: boolean = false;
@@ -168,7 +169,6 @@ export class Pagos_Clientes implements OnInit {
             await Promise.all([this.cargarOpciones(this.estadoService.getEstadoPagos.bind(this.estadoService), this.opcionesEstadoPago, 'estado pago')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             await this.cargarPagosClientes();
-            await this.cargarDetallePagosClientes();
         } catch (error) {
             console.error('Error al cargar los clientes:', error);
         } finally {
@@ -192,7 +192,8 @@ export class Pagos_Clientes implements OnInit {
             cuotas: '',
             estado_id: 1,
             fecha_creacion: '',
-            fecha_modificacion: ''
+            fecha_modificacion: '',
+            detalles_pago: []
         };
     }
 
@@ -222,17 +223,6 @@ export class Pagos_Clientes implements OnInit {
                 return 'info';
         }
     }
-
-    /*
-    formatDate(date: any): string {
-        if (!date) return '';
-        const d = new Date(date);
-        return d.toISOString().split('T')[0]; // Retorna en formato YYYY-MM-DD
-    }
-
-    fecha_pago_inicial: pagocliente.fecha_pago_inicial ? new Date(pagocliente.fecha_pago_inicial).toISOString().split('T')[0] : '',
-    fecha_pago_final: pagocliente.fecha_pago_final ? new Date(pagocliente.fecha_pago_final).toISOString().split('T')[0] : ''
-    */
 
     async guardarPagosClientes() {
         this.enviar = true;
@@ -293,19 +283,6 @@ export class Pagos_Clientes implements OnInit {
     DetallepagoclienteDialogo: boolean = false;
     enviarDetalle: boolean = false;
     isLoadingDetalle: boolean = false;
-    detallespagosclientes = signal<DetallesPC[]>([]);
-    detallepagocliente: DetallesPC = {
-        id: 0,
-        pagosclientes_id : 0,
-        cuotaspagadas: '',
-        monto_cuotas : 0,
-        fecha_pago : '',
-        estado_pago_id: 1,
-        estado_id: 1,
-        fecha_creacion : '',
-        fecha_modificacion: '',
-    };
-
 
     abrirDetalleNuevo() {
         this.accionDetalle = 1;
@@ -315,6 +292,15 @@ export class Pagos_Clientes implements OnInit {
     }
 
     limpiarDatosDetalles() {
+        this.detalle_pago = {
+            id: 0,
+            pagosclientes_id: 0,
+            cuotaspagadas: '',
+            monto_cuotas: 0,
+            fechapago: '',
+            estado_pago_id: 1,
+            estado_id: 1,
+        };
     }
 
     ocultarDetalleDialogo() {
@@ -324,8 +310,45 @@ export class Pagos_Clientes implements OnInit {
 
     async guardarDetallePagosClientes() {
         this.isLoadingDetalle = true;
-        try {} catch (error: unknown) {} finally {}
+        try {
+            const DetallePagoClienteParaEnviar = {
+                id: this.detalle_pago.id,
+                pagosclientes: this.detalle_pago.pagosclientes_id,
+                cuotaspagadas: this.detalle_pago.cuotaspagadas,
+                monto_cuotas: this.detalle_pago.monto_cuotas,
+                fechapago: this.detalle_pago.fechapago,
+                estado_pago_id: this.detalle_pago.estado_pago_id,
+                estado_id: this.detalle_pago.estado_id,
+            };
+
+            const response = this.accion === 1 ?
+                await this.detalle_pago_clienteService.createDetallesPagosClientes(DetallePagoClienteParaEnviar) :
+                await this.detalle_pago_clienteService.updateDetallesPagosClientes(this.detalle_pago.id, DetallePagoClienteParaEnviar);
+
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
+            await this.cargarPagosClientes();
+            this.ocultarDialogo();
+        } catch (error: unknown) {} finally {}
     }
+
+    detallespagos = signal<DetallePago[]>([]);
+    detalle_pago: DetallePago = {
+        id: 0,
+        pagosclientes_id: 0,
+        cuotaspagadas: '',
+        monto_cuotas: 0,
+        fechapago: '',
+        estado_pago_id: 1,
+        estado_id: 1,
+    };
+
+    editarDetallePagoCliente(detalle_pago: DetallePago) {
+        console.log(detalle_pago);
+        this.detalle_pago = { ...detalle_pago };
+        this.accionDetalle = 2;
+        this.DetallepagoclienteDialogo = true;
+    }
+
 
     getEstadoPago(estado_pago_id: number): string {
         switch (estado_pago_id) {
@@ -346,17 +369,6 @@ export class Pagos_Clientes implements OnInit {
                 return 'danger';
             default:
                 return 'info';
-        }
-    }
-
-    async cargarDetallePagosClientes() {
-        this.isLoadingDetalle = true;
-        try {
-            const response: DetallesPC[] = await this.detalle_pago_clienteService.getDetallesPagosClientes();
-            console.log(response);
-            this.detallespagosclientes.set(response);
-        } catch (error) {
-            console.error('Error al cargar los pagos de los clientes:', error);
         }
     }
 

@@ -2,7 +2,7 @@
 
 <p-toolbar styleClass="mb-6">
     <ng-template #start>
-        <p-button label="Nuevo" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="abrirNuevo()" />
+        <p-button label="Nuevo pago de cliente" icon="pi pi-plus" severity="info" class="mr-2" (onClick)="abrirNuevo()" />
         <p-button severity="secondary" label="Eliminar seleccionados" icon="pi pi-trash" outlined />
     </ng-template>
     <ng-template #end>
@@ -91,7 +91,7 @@
                                 </div>
                                 <p-divider />
 
-                                <p-table [value]="detallespagosclientes()" showGridlines [tableStyle]="{ 'min-width': '40rem' }">
+                                <p-table [value]="pagocliente.detalles_pago" showGridlines [tableStyle]="{ 'min-width': '40rem' }">
                                     <ng-template #header>
                                         <tr>
                                             <th>Acciones</th>
@@ -102,20 +102,20 @@
                                             <th>Estado</th>
                                         </tr>
                                     </ng-template>
-                                    <ng-template #body let-detallepagocliente>
+                                    <ng-template #body let-detalle_pago>
                                         <tr>
                                             <td>
-                                                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" />
+                                                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarDetallePagoCliente(detalle_pago)"/>
                                                 <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" />
                                             </td>
-                                            <td>{{detallepagocliente.cuotaspagadas}}</td>
-                                            <td>{{detallepagocliente.monto_cuotas}}</td>
-                                            <td>{{detallepagocliente.fechapago}}</td>
+                                            <td>{{detalle_pago.cuotaspagadas}}</td>
+                                            <td>{{detalle_pago.monto_cuotas}}</td>
+                                            <td>{{detalle_pago.fechapago}}</td>
                                             <td>
-                                                <p-tag [value]="getEstadoPago(detallepagocliente.estado_pago_id)" />
+                                                <p-tag [value]="getEstadoPago(detalle_pago.estado_pago_id)" />
                                             </td>
                                             <td>
-                                                <p-tag [value]="getEstado(detallepagocliente.estado_id)"/>
+                                                <p-tag [value]="getEstado(detalle_pago.estado_id)"/>
                                             </td>
                                         </tr>
                                     </ng-template>
@@ -163,7 +163,31 @@
 
 <p-drawer [(visible)]="DetallepagoclienteDialogo" [style]="{ width: '450px' }" [header]="accionDetalle === 1 ? 'Nuevo Detalle Pago de cliente' : 'Actualizar Detalle Pago de cliente'" [modal]="true" position="right">
     <ng-template #content>
-        <div class="flex flex-col gap-6"></div>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="cuotaspagadas" class="block font-bold mb-3">Cuotas pagadas</label>
+                <input type="text" pInputText [(ngModel)]="detalle_pago.cuotaspagadas" id="cuotaspagadas" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !detalle_pago.cuotaspagadas ">Cuotas pagadas es requerida</small>
+            </div>
+            <div>
+                <label for="monto_cuotas" class="block font-bold mb-3">Monto de cuotas</label>
+                <input type="text" pInputText [(ngModel)]="detalle_pago.monto_cuotas" id="monto_cuotas" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !detalle_pago.monto_cuotas ">Monto de cuotas es requerida</small>
+            </div>
+            <div>
+                <label for="fechapago" class="block font-bold mb-3">Fecha de pago</label>
+                <p-datepicker [(ngModel)]="detalle_pago.fechapago" [showIcon]="true" inputId="buttondisplay" [showOnFocus]="false" dateFormat="dd-mm-yy" id="fechapago" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !detalle_pago.fechapago ">Fecha de pago es requerida</small>
+            </div>
+            <div>
+                <label for="estado_pago_id" class="block font-bold mb-3">Estado de pago</label>
+                <p-select [(ngModel)]="detalle_pago.estado_pago_id" inputId="estado_pago_id" [options]="opcionesEstadoPago" optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado de pago" appendTo="body" fluid />
+            </div>
+            <div *ngIf="accionDetalle === 2">
+                <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                <p-select [(ngModel)]="detalle_pago.estado_id" inputId="estado_id" [options]="opcionesEstado" optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+        </div>
     </ng-template>
     <ng-template #footer>
         <p-button label="Cancelar" class="mr-2" icon="pi pi-times" variant="text" [raised]="true" severity="danger" (click)="ocultarDetalleDialogo()" />
