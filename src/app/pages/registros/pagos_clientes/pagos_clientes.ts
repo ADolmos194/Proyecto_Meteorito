@@ -1,7 +1,7 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -282,14 +282,15 @@ export class Pagos_Clientes implements OnInit {
     accionDetalle: number = 1;
     DetallepagoclienteDialogo: boolean = false;
     enviarDetalle: boolean = false;
-    isLoadingDetalle: boolean = false;
 
-    abrirDetalleNuevo() {
+    abrirDetalleNuevo(pagocliente: PC) {
         this.accionDetalle = 1;
         this.enviarDetalle = false;
         this.limpiarDatosDetalles();
+        this.detalle_pago.pagosclientes_id = pagocliente.id;
         this.DetallepagoclienteDialogo = true;
     }
+
 
     limpiarDatosDetalles() {
         this.detalle_pago = {
@@ -309,27 +310,51 @@ export class Pagos_Clientes implements OnInit {
     }
 
     async guardarDetallePagosClientes() {
-        this.isLoadingDetalle = true;
+        this.isLoading = true;
         try {
+            const fechaFormateada = this.detalle_pago.fechapago
+                ? formatDate(this.detalle_pago.fechapago, 'yyyy-MM-dd', 'en-US')
+                : '';
+
             const DetallePagoClienteParaEnviar = {
                 id: this.detalle_pago.id,
                 pagosclientes: this.detalle_pago.pagosclientes_id,
                 cuotaspagadas: this.detalle_pago.cuotaspagadas,
                 monto_cuotas: this.detalle_pago.monto_cuotas,
-                fechapago: this.detalle_pago.fechapago,
-                estado_pago_id: this.detalle_pago.estado_pago_id,
-                estado_id: this.detalle_pago.estado_id,
+                fechapago: fechaFormateada,
+                estado_pago: this.detalle_pago.estado_pago_id,
+                estado: this.detalle_pago.estado_id,
             };
 
-            const response = this.accion === 1 ?
-                await this.detalle_pago_clienteService.createDetallesPagosClientes(DetallePagoClienteParaEnviar) :
-                await this.detalle_pago_clienteService.updateDetallesPagosClientes(this.detalle_pago.id, DetallePagoClienteParaEnviar);
+            // Envía el nuevo detalle de pago al backend
+            await this.detalle_pago_clienteService.createDetallesPagosClientes(DetallePagoClienteParaEnviar);
 
-            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
-            await this.cargarPagosClientes();
-            this.ocultarDialogo();
-        } catch (error: unknown) {} finally {}
+            // 🔹 Encuentra el pago cliente al que pertenece este detalle
+            const index = this.pagosclientes().findIndex(p => p.id === this.detalle_pago.pagosclientes_id);
+            if (index !== -1) {
+                // 🔹 Actualiza la lista local sin esperar al backend
+                const updatedPagosClientes = [...this.pagosclientes()];
+                updatedPagosClientes[index] = {
+                    ...updatedPagosClientes[index],
+                    detalles_pago: [...updatedPagosClientes[index].detalles_pago, this.detalle_pago]
+                };
+
+                this.pagosclientes.set(updatedPagosClientes);
+            }
+
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Detalle agregado correctamente' });
+
+            // 🔹 Recarga los datos del backend en segundo plano (sin bloquear la UI)
+            this.cargarPagosClientes();
+
+            this.ocultarDetalleDialogo();
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            this.isLoading = false;
+        }
     }
+
 
     detallespagos = signal<DetallePago[]>([]);
     detalle_pago: DetallePago = {
@@ -343,7 +368,6 @@ export class Pagos_Clientes implements OnInit {
     };
 
     editarDetallePagoCliente(detalle_pago: DetallePago) {
-        console.log(detalle_pago);
         this.detalle_pago = { ...detalle_pago };
         this.accionDetalle = 2;
         this.DetallepagoclienteDialogo = true;

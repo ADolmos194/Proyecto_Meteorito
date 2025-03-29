@@ -68,7 +68,7 @@
                                         <p-button label="Eliminar" icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarPagoCliente(pagocliente)" />
                                     </div>
                                     <div class="flex gap-2">
-                                        <p-button label="Agregar detalle" icon="pi pi-plus" class="mr-2" severity="info" [rounded]="true" [outlined]="true" (onClick)="abrirDetalleNuevo()" />
+                                        <p-button label="Agregar detalle" icon="pi pi-plus" class="mr-2" severity="info" [rounded]="true" [outlined]="true" (click)="abrirDetalleNuevo(pagocliente)"  />
                                     </div>
                                 </div>
                             </div>
@@ -176,7 +176,7 @@
             </div>
             <div>
                 <label for="fechapago" class="block font-bold mb-3">Fecha de pago</label>
-                <p-datepicker [(ngModel)]="detalle_pago.fechapago" [showIcon]="true" inputId="buttondisplay" [showOnFocus]="false" dateFormat="dd-mm-yy" id="fechapago" required fluid />
+                <p-datepicker [(ngModel)]="detalle_pago.fechapago" [showIcon]="true" inputId="buttondisplay" [showOnFocus]="false" dateFormat="yy-mm-dd" id="fechapago" required fluid />
                 <small class="text-red-500" *ngIf="enviar && !detalle_pago.fechapago ">Fecha de pago es requerida</small>
             </div>
             <div>

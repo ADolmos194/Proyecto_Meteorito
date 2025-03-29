@@ -6,6 +6,4 @@ export interface DetallesPC {
     fecha_pago : string;
     estado_pago_id: number;
     estado_id: number;
-    fecha_creacion : string;
-    fecha_modificacion: string;
 }
