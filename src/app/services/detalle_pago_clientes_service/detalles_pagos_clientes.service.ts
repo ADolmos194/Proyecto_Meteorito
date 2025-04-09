@@ -13,16 +13,6 @@ export const endpoints = {
     providedIn: 'root',
 })
 export class DetallesPagosClientesService {
-    /* async getDetallesPagosClientes() {
-        try {
-            const response = await axiosIns.get(`${url}${endpoints.detallespagosclientes}`);
-            console.log('Detalles de pago del cliente:', response.data.data);
-            return response.data.data;
-        } catch (error) {
-            console.error('Error al obtener los detalle de pago del cliente:', error);
-            throw error;
-        }
-    }*/
 
     async createDetallesPagosClientes(data: any) {
         try {

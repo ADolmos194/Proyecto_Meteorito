@@ -5,28 +5,33 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
 import { ToastModule } from 'primeng/toast';
 import { AutenticacionService } from '@/services/login_service/login.service';
+import { InactividadService } from '../service/inactividad.service';
 
 @Component({
     selector: 'app-menu',
     standalone: true,
-    imports: [CommonModule, AppMenuitem, RouterModule, ToastModule], // Agrega ToastModule
+    imports: [CommonModule, AppMenuitem, RouterModule, ToastModule],
     template: `
     <p-toast></p-toast> <!-- Toast para mostrar mensajes -->
+
     <ul class="layout-menu">
         <ng-container *ngFor="let item of model; let i = index">
             <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
             <li *ngIf="item.separator" class="menu-separator"></li>
         </ng-container>
     </ul> `,
-    providers: [MessageService] 
+    providers: [MessageService]
 })
 export class AppMenu {
     model: MenuItem[] = [];
 
+    isLoading: boolean = false;
+
     constructor(
         private autenticacionService: AutenticacionService,
         private router: Router,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private inactividadService: InactividadService
     ) {}
 
     ngOnInit() {
@@ -66,19 +71,30 @@ export class AppMenu {
             {
                 label: 'Seguridad',
                 items: [
-                    { label: 'Cerrar sesión', icon: 'pi pi-fw pi-sign-out', command: () => this.cerrarSesion()}
+                    { label: 'Cerrar sesión', icon: 'pi pi-fw pi-sign-out', command: () => this.cerrarSesion() }
                 ]
             }
         ];
+        this.inactividadService.iniciarInactividad();
     }
 
     cerrarSesion() {
-        this.autenticacionService.logoutUser().then(() => {
-            this.router.navigate(['/auth/login']);
-            console.log('Cierre de sesion exitoso');
-        }).catch(() => {
-            console.error('error al cerrar la sesion')
+        this.isLoading = true;
+
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Sesión Cerrada',
+            detail: 'La sesión se ha cerrado exitosamente.',
+            life: 3000
         });
+
+        setTimeout(() => {
+            this.autenticacionService.logoutUser().then(() => {
+                this.router.navigate(['/auth/login']);
+            }).catch(() => {
+                console.error('Error al cerrar la sesión');
+            });
+        }, 3000);
     }
 }
 

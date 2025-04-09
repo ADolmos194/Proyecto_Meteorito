@@ -46,7 +46,7 @@ export class Login {
 
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
-                this.router.navigate(['/']); // Redirige al dashboard
+                this.router.navigate(['/']); 
             } catch (error) {
                 this.messageService.add({
                     severity: 'error',

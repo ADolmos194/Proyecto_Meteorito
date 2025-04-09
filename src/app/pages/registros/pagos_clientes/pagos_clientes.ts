@@ -140,7 +140,6 @@ export class Pagos_Clientes implements OnInit {
         this.isLoading = true;
         try {
             const response: PC[] = await this.pago_clienteService.getPagosClientes();
-            console.log(response);
             this.pagosclientes.set(response);
         } catch (error) {
             console.error('Error al cargar los pagos de los clientes:', error);
@@ -283,6 +282,7 @@ export class Pagos_Clientes implements OnInit {
     DetallepagoclienteDialogo: boolean = false;
     enviarDetalle: boolean = false;
 
+
     abrirDetalleNuevo(pagocliente: PC) {
         this.accionDetalle = 1;
         this.enviarDetalle = false;
@@ -310,6 +310,7 @@ export class Pagos_Clientes implements OnInit {
     }
 
     async guardarDetallePagosClientes() {
+        this.enviarDetalle = true;
         this.isLoading = true;
         try {
             const fechaFormateada = this.detalle_pago.fechapago
@@ -326,30 +327,18 @@ export class Pagos_Clientes implements OnInit {
                 estado: this.detalle_pago.estado_id,
             };
 
-            // Envía el nuevo detalle de pago al backend
-            await this.detalle_pago_clienteService.createDetallesPagosClientes(DetallePagoClienteParaEnviar);
+            const response = this.accionDetalle === 1
+                ? await this.detalle_pago_clienteService.createDetallesPagosClientes(DetallePagoClienteParaEnviar)
+                : await this.detalle_pago_clienteService.updateDetallesPagosClientes(this.detalle_pago.id, DetallePagoClienteParaEnviar);
 
-            // 🔹 Encuentra el pago cliente al que pertenece este detalle
-            const index = this.pagosclientes().findIndex(p => p.id === this.detalle_pago.pagosclientes_id);
-            if (index !== -1) {
-                // 🔹 Actualiza la lista local sin esperar al backend
-                const updatedPagosClientes = [...this.pagosclientes()];
-                updatedPagosClientes[index] = {
-                    ...updatedPagosClientes[index],
-                    detalles_pago: [...updatedPagosClientes[index].detalles_pago, this.detalle_pago]
-                };
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
 
-                this.pagosclientes.set(updatedPagosClientes);
-            }
-
-            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Detalle agregado correctamente' });
-
-            // 🔹 Recarga los datos del backend en segundo plano (sin bloquear la UI)
             this.cargarPagosClientes();
 
             this.ocultarDetalleDialogo();
-        } catch (error) {
-            console.error('Error:', error);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Error inesperado';
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
         } finally {
             this.isLoading = false;
         }
@@ -371,6 +360,21 @@ export class Pagos_Clientes implements OnInit {
         this.detalle_pago = { ...detalle_pago };
         this.accionDetalle = 2;
         this.DetallepagoclienteDialogo = true;
+    }
+
+    async eliminarDetallePagoCliente(detalle_pago: DetallePago) {
+        const id = detalle_pago.id;
+        this.isLoading = true;
+        try {
+            const response = await this.detalle_pago_clienteService.deleteDetallesPagosClientes(id);
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+            await this.cargarPagosClientes();
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Error inesperado';
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
+        } finally {
+            this.isLoading = false;
+        }
     }
 
 

@@ -58,7 +58,7 @@
         </tr>
     </ng-template>
 
-    <ng-template #body let-cliente>
+    <ng-template #body let-cliente >
         <tr>
             <td>
                 <p-tableCheckbox [value]="cliente" />
@@ -79,6 +79,16 @@
             </td>
             <td>{{ cliente.fecha_creacion }}</td>
             <td>{{ cliente.fecha_modificacion }}</td>
+        </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+        <tr>
+            <td colspan="10">No hay registros a mostrar</td>
+        </tr>
+    </ng-template>
+    <ng-template #loadingbody>
+        <tr>
+            <td colspan="10">Cargando los registro. Por favor, espere...</td>
         </tr>
     </ng-template>
 </p-table>

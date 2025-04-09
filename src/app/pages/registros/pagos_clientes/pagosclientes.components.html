@@ -20,8 +20,6 @@
         [paginator]="true"
         [rowHover]="true"
         dataKey="id"
-        [loading]="isLoading"
-        loadingIcon="pi pi-spinner"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} pagos de clientes"
         [showCurrentPageReport]="true"
         [rowsPerPageOptions]="[10, 20, 30]"
@@ -41,7 +39,7 @@
         <ng-template #grid>
             <div class="grid grid-cols-12 gap-4">
                 <ng-container *ngIf="isLoading; else dataLoaded">
-                    <div *ngFor="let i of [].constructor(4)" class="col-span-12 sm:col-span-5 md:col-span-5 xl:col-span-5 p-2">
+                    <div *ngFor="let i of [].constructor(2)" class="col-span-12 sm:col-span-5 md:col-span-5 xl:col-span-5 p-2">
                         <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col">
                             <div class="flex flex-row justify-between items-center mb-4">
                                 <p-skeleton width="60%" height="1.5rem"></p-skeleton>
@@ -58,7 +56,7 @@
                 </ng-container>
 
                 <!-- Cuando termina de cargar, mostramos los datos -->
-                <ng-template #dataLoaded>
+                <ng-template #dataLoaded >
                     <div *ngFor="let pagocliente of pagosclientes()" class="col-span-12 sm:col-span-6 md:col-span-6 xl:col-span-6 p-2">
                         <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col">
                             <div class="flex flex-col gap-6 mt-1">
@@ -91,7 +89,7 @@
                                 </div>
                                 <p-divider />
 
-                                <p-table [value]="pagocliente.detalles_pago" showGridlines [tableStyle]="{ 'min-width': '40rem' }">
+                                <p-table [value]="pagocliente.detalles_pago" showGridlines [tableStyle]="{ 'min-width': '40rem' }" [isLoading]="isLoading" [rows]="5" [paginator]="true" [rowsPerPageOptions]="[5, 10]">
                                     <ng-template #header>
                                         <tr>
                                             <th>Acciones</th>
@@ -106,7 +104,7 @@
                                         <tr>
                                             <td>
                                                 <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editarDetallePagoCliente(detalle_pago)"/>
-                                                <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" />
+                                                <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true" (click)="eliminarDetallePagoCliente(detalle_pago)"/>
                                             </td>
                                             <td>{{detalle_pago.cuotaspagadas}}</td>
                                             <td>{{detalle_pago.monto_cuotas}}</td>
@@ -126,6 +124,7 @@
                 </ng-template>
             </div>
         </ng-template>
+        <ng-template #emptymessage></ng-template>
     </p-dataview>
 </p-card>
 <!-- '"success" | "info" | "warn" | "danger" | "help" | "primary" | "secondary" |  -->

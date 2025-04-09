@@ -82,6 +82,16 @@
             <td>{{ ttesiss.fecha_modificacion }}</td>
         </tr>
     </ng-template>
+    <ng-template #emptymessage>
+        <tr>
+            <td colspan="10">No hay registros a mostrar</td>
+        </tr>
+    </ng-template>
+    <ng-template #loadingbody>
+        <tr>
+            <td colspan="10">Cargando los registro. Por favor, espere...</td>
+        </tr>
+    </ng-template>
 </p-table>
 </div>
 <div class="card">
